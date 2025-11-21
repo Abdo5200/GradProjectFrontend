@@ -1,18 +1,70 @@
-import { Link } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { Brain, Lock, CheckCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { resetPassword } from "../services/api";
 
 export function ResetPasswordPage() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const tokenParam = searchParams.get("token");
+    if (!tokenParam) {
+      toast.error("Invalid reset link", {
+        description: "Please request a new password reset link",
+      });
+      navigate("/forgot-password");
+    } else {
+      setToken(tokenParam);
+    }
+  }, [searchParams, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Password reset successful!", {
-      description: "You can now sign in with your new password",
-    });
-    console.log("Password reset submitted");
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords don't match", {
+        description: "Please make sure both passwords are identical",
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password too short", {
+        description: "Password must be at least 6 characters",
+      });
+      return;
+    }
+
+    if (!token) {
+      toast.error("Invalid reset token");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await resetPassword(token, password);
+      toast.success("Password reset successful!", {
+        description: response.message || "You can now sign in with your new password",
+      });
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (error) {
+      toast.error("Failed to reset password", {
+        description: error instanceof Error ? error.message : "Please try again or request a new reset link",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,6 +158,9 @@ export function ResetPasswordPage() {
                   type="password"
                   placeholder="••••••••"
                   className="pl-10 h-11"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
                   required
                 />
               </div>
@@ -127,6 +182,9 @@ export function ResetPasswordPage() {
                   type="password"
                   placeholder="••••••••"
                   className="pl-10 h-11"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={loading}
                   required
                 />
               </div>
@@ -152,8 +210,9 @@ export function ResetPasswordPage() {
               <Button
                 type="submit"
                 className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={loading}
               >
-                Reset Password
+                {loading ? "Resetting..." : "Reset Password"}
               </Button>
             </motion.div>
           </form>

@@ -5,14 +5,30 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useState } from "react";
+import { forgotPassword } from "../services/api";
 
 export function ForgotPasswordPage() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Password reset email sent!", {
-      description: "Check your inbox for the reset link",
-    });
-    console.log("Reset password email sent");
+    setLoading(true);
+
+    try {
+      const response = await forgotPassword(email);
+      toast.success("Password reset email sent!", {
+        description: response.message || "Check your inbox for the reset link",
+      });
+      setEmail("");
+    } catch (error) {
+      toast.error("Failed to send reset email", {
+        description: error instanceof Error ? error.message : "Please try again later",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -93,6 +109,9 @@ export function ForgotPasswordPage() {
                   type="email"
                   placeholder="you@example.com"
                   className="pl-10 h-11"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
                   required
                 />
               </div>
@@ -102,8 +121,12 @@ export function ForgotPasswordPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Button type="submit" className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white">
-                Send Reset Link
+              <Button
+                type="submit"
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={loading}
+              >
+                {loading ? "Sending..." : "Send Reset Link"}
               </Button>
             </motion.div>
           </form>

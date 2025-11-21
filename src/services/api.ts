@@ -41,8 +41,18 @@ export const forgotPassword = async (email: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
     method: "POST",
     headers: { "Content-type": "application/json" },
-    body: JSON.stringify(email),
+    body: JSON.stringify({ email }),
   });
   if (!response.ok) throw new Error("Failed to send reset email");
+  return response.json();
+};
+
+export const resetPassword = async (token: string, newPassword: string) => {
+  const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+    method: "PATCH",
+    headers: { "Content-type": "application/json" },
+    body: JSON.stringify({ token, newPassword }),
+  });
+  if (!response.ok) throw new Error("Failed to reset password");
   return response.json();
 };
