@@ -1,35 +1,18 @@
-import { Link, useNavigate } from "react-router";
-import { useState } from "react";
-import { Brain, Mail, Lock } from "lucide-react";
+import { Link } from "react-router";
+import { Brain, Lock, CheckCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { login as loginApi } from "../services/api";
-import { useAuth } from "../context/AuthContext";
 
-export function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { login } = useAuth();
-
-  const handleSubmit = async (e: React.FormEvent) => {
+export function ResetPasswordPage() {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    const formData = new FormData(e.target as HTMLFormElement);
-    const data = Object.fromEntries(formData.entries());
-    try {
-      const response = await loginApi(data);
-      // Assuming response contains { token: string, user: { email, role } }
-      login(response.token, response.user);
-      toast.success("Logged in successfully!");
-      navigate("/");
-    } catch (error) {
-      toast.error("Login Failed!");
-    } finally {
-      setIsLoading(false);
-    }
+    toast.success("Password reset successful!", {
+      description: "You can now sign in with your new password",
+    });
+    console.log("Password reset submitted");
   };
 
   return (
@@ -94,35 +77,19 @@ export function LoginPage() {
           className="bg-white rounded-2xl shadow-2xl p-8"
         >
           <div className="mb-8 text-center">
-            <h1 className="text-3xl mb-2 text-slate-900">Welcome Back</h1>
-            <p className="text-slate-600">
-              Sign in to your account to continue
-            </p>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+              className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4"
+            >
+              <CheckCircle className="w-8 h-8 text-blue-600" />
+            </motion.div>
+            <h1 className="text-3xl mb-2 text-slate-900">Reset Password</h1>
+            <p className="text-slate-600">Enter your new password below</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="space-y-2"
-            >
-              <Label htmlFor="email" className="text-slate-900">
-                Email
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className="pl-10 h-11"
-                  required
-                />
-              </div>
-            </motion.div>
-
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -130,13 +97,12 @@ export function LoginPage() {
               className="space-y-2"
             >
               <Label htmlFor="password" className="text-slate-900">
-                Password
+                New Password
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                 <Input
                   id="password"
-                  name="password"
                   type="password"
                   placeholder="••••••••"
                   className="pl-10 h-11"
@@ -145,33 +111,59 @@ export function LoginPage() {
               </div>
             </motion.div>
 
-            <div className="flex items-center justify-end text-sm">
-              <Link
-                to="/forgot-password"
-                className="text-blue-600 hover:text-blue-700 transition-colors"
-              >
-                Forgot password?
-              </Link>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="space-y-2"
+            >
+              <Label htmlFor="confirm-password" className="text-slate-900">
+                Confirm New Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  placeholder="••••••••"
+                  className="pl-10 h-11"
+                  required
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+              className="bg-blue-50 border border-blue-200 rounded-lg p-4"
+            >
+              <p className="text-sm text-slate-900 mb-2">
+                Password must contain:
+              </p>
+              <ul className="text-sm text-slate-700 space-y-1 list-disc list-inside">
+                <li>At least 8 characters</li>
+                <li>One uppercase letter</li>
+                <li>One lowercase letter</li>
+              </ul>
+            </motion.div>
 
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 type="submit"
                 className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white"
-                disabled={isLoading}
               >
-                {isLoading ? "Signing In..." : "Sign In"}
+                Reset Password
               </Button>
             </motion.div>
           </form>
 
           <div className="mt-6 text-center">
-            <span className="text-slate-600">Don't have an account? </span>
             <Link
-              to="/signup"
+              to="/login"
               className="text-blue-600 hover:text-blue-700 transition-colors"
             >
-              Sign up
+              Back to Sign In
             </Link>
           </div>
         </motion.div>

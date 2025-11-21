@@ -1,8 +1,10 @@
 import { Link } from "react-router";
 import { Brain } from "lucide-react";
 import { Button } from "./ui/button";
+import { useAuth } from "../context/AuthContext";
 
 export function Header() {
+  const { isAuthenticated, logout } = useAuth();
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,26 +17,53 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-slate-700 hover:text-blue-600 transition-colors">
+            <a
+              href="#features"
+              className="text-slate-700 hover:text-blue-600 transition-colors"
+            >
               Features
             </a>
-            <a href="#how-it-works" className="text-slate-700 hover:text-blue-600 transition-colors">
+            <a
+              href="#how-it-works"
+              className="text-slate-700 hover:text-blue-600 transition-colors"
+            >
               How It Works
             </a>
-            <a href="#modalities" className="text-slate-700 hover:text-blue-600 transition-colors">
+            <a
+              href="#modalities"
+              className="text-slate-700 hover:text-blue-600 transition-colors"
+            >
               Modalities
             </a>
-            <a href="#contact" className="text-slate-700 hover:text-blue-600 transition-colors">
+            <a
+              href="#contact"
+              className="text-slate-700 hover:text-blue-600 transition-colors"
+            >
               Contact
             </a>
-            <Link to="/login" className="text-slate-700 hover:text-blue-600 transition-colors">
-              Log In
-            </Link>
-            <Link to="/signup">
-              <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer">
-                Sign Up
+            {isAuthenticated ? (
+              <Button
+                variant="ghost"
+                className="text-slate-700 hover:text-blue-600 transition-colors cursor-pointer"
+                onClick={logout}
+              >
+                Log Out
               </Button>
-            </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-slate-700 hover:text-blue-600 transition-colors"
+                >
+                  Log In
+                </Link>
+                <Link to="/signup">
+                  <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </div>
