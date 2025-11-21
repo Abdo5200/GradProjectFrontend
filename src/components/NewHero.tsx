@@ -3,15 +3,18 @@ import { Brain, Shield, Sparkles, Zap } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { motion } from "motion/react";
+import { useAuth } from "../context/AuthContext";
 
 export function NewHero() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40"></div>
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40 pointer-events-none"></div>
 
       {/* Floating particles */}
       <motion.div
-        className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl"
+        className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl pointer-events-none"
         animate={{
           y: [0, -20, 0],
           x: [0, 10, 0],
@@ -23,7 +26,7 @@ export function NewHero() {
         }}
       />
       <motion.div
-        className="absolute top-40 right-20 w-32 h-32 bg-cyan-300/20 rounded-full blur-2xl"
+        className="absolute top-40 right-20 w-32 h-32 bg-cyan-300/20 rounded-full blur-2xl pointer-events-none"
         animate={{
           y: [0, 30, 0],
           x: [0, -15, 0],
@@ -35,7 +38,7 @@ export function NewHero() {
         }}
       />
       <motion.div
-        className="absolute bottom-40 left-1/4 w-24 h-24 bg-blue-300/20 rounded-full blur-xl"
+        className="absolute bottom-40 left-1/4 w-24 h-24 bg-blue-300/20 rounded-full blur-xl pointer-events-none"
         animate={{
           y: [0, -25, 0],
           x: [0, 20, 0],
@@ -47,7 +50,7 @@ export function NewHero() {
         }}
       />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
         <div className="text-center">
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
@@ -128,12 +131,15 @@ export function NewHero() {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="cursor-pointer w-full sm:w-auto"
+              className="cursor-pointer inline-block relative z-10"
             >
-              <Link to="/signup" className="flex w-full select-none">
+              <Link
+                to={isAuthenticated ? "/analysis" : "/login"}
+                className="inline-flex select-none cursor-pointer relative z-10"
+              >
                 <Button
                   size="lg"
-                  className="bg-white text-blue-600 hover:bg-slate-50 w-full cursor-pointer select-none"
+                  className="bg-white text-blue-600 hover:bg-slate-50 cursor-pointer select-none relative z-10"
                 >
                   Get Started
                 </Button>
@@ -156,7 +162,7 @@ export function NewHero() {
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0">
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
         <svg
           viewBox="0 0 1440 120"
           fill="none"

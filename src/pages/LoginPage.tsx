@@ -24,7 +24,7 @@ export function LoginPage() {
       // Assuming response contains { token: string, user: { email, role } }
       login(response.token, response.user);
       toast.success("Logged in successfully!");
-      navigate("/");
+      navigate("/analysis");
     } catch (error) {
       toast.error("Login Failed!");
     } finally {
