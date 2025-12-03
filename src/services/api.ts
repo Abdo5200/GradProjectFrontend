@@ -133,3 +133,114 @@ export const resetPassword = async (token: string, newPassword: string) => {
   if (!response.ok) throw new Error("Failed to reset password");
   return response.json();
 };
+
+// Request a presigned PUT URL from the backend for direct S3 upload.
+// Backend returns: { presignedUrl: string, key: string, message: string }
+export const getPresignedPutUrl = async (
+  fileName: string,
+  contentType: string,
+  folder?: string
+) => {
+  const token = localStorage.getItem("token");
+  console.log("Auth token present:", !!token);
+  console.log("Requesting presigned URL with payload:", {
+    fileName,
+    contentType,
+    folder,
+  });
+
+  const response = await fetchWithAuth(
+    `${API_BASE_URL}/api/files/presigned-url`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fileName, contentType, folder }),
+    }
+  );
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Presigned URL request failed:", {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText,
+      headers: Object.fromEntries(response.headers.entries()),
+    });
+    throw new Error(
+      `Failed to get presigned URL: ${response.status} ${errorText}`
+    );
+  }
+  return response.json();
+};
+
+// Upload a Blob/File directly to the returned presigned URL (S3 PUT)
+export const uploadToPresignedUrl = async (
+  url: string,
+  blob: Blob,
+  contentType: string
+) => {
+  const headers: Record<string, string> = {
+    "Content-Type": contentType,
+    // Only send headers that are in the presigned URL signature
+    // Backend is signing with: content-type and host only
+  };
+
+  const res = await fetch(url, {
+    method: "PUT",
+    headers,
+    body: blob,
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("S3 upload failed:", {
+      status: res.status,
+      statusText: res.statusText,
+      body: errorText,
+    });
+    throw new Error(`Failed to upload to storage: ${res.status}`);
+  }
+  return res;
+};
+
+// Notify backend that upload is complete so it can save the key
+export const notifyUploadComplete = async (key: string) => {
+  const response = await fetchWithAuth(
+    `${API_BASE_URL}/api/files/upload-complete`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key }),
+    }
+  );
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Upload complete notification failed:", {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText,
+    });
+    throw new Error(
+      `Failed to notify upload completion: ${response.status} ${errorText}`
+    );
+  }
+  return response.json();
+};
+
+// Ask backend to trigger analysis given the uploaded file key (or path).
+// Backend should perform the analysis and return the result JSON.
+export const triggerAnalysis = async (key: string) => {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/files/analyze`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key }),
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Analysis request failed:", {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText,
+    });
+    throw new Error(`Analysis request failed: ${response.status} ${errorText}`);
+  }
+  return response.json();
+};
