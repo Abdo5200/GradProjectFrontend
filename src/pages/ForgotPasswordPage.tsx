@@ -120,10 +120,11 @@ export function ForgotPasswordPage() {
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              className="cursor-pointer"
             >
               <Button
                 type="submit"
-                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                 disabled={loading}
               >
                 {loading ? "Sending..." : "Send Reset Link"}

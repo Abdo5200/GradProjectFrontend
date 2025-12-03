@@ -55,12 +55,16 @@ export function ResetPasswordPage() {
     try {
       const response = await resetPassword(token, password);
       toast.success("Password reset successful!", {
-        description: response.message || "You can now sign in with your new password",
+        description:
+          response.message || "You can now sign in with your new password",
       });
       setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
       toast.error("Failed to reset password", {
-        description: error instanceof Error ? error.message : "Please try again or request a new reset link",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please try again or request a new reset link",
       });
     } finally {
       setLoading(false);
@@ -206,10 +210,14 @@ export function ResetPasswordPage() {
               </ul>
             </motion.div>
 
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="cursor-pointer"
+            >
               <Button
                 type="submit"
-                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                 disabled={loading}
               >
                 {loading ? "Resetting..." : "Reset Password"}

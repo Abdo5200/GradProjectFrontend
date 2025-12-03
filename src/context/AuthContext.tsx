@@ -6,6 +6,7 @@ import {
   ReactNode,
 } from "react";
 import { Role } from "../types/auth";
+import { logout as apiLogout } from "../services/api";
 
 interface User {
   email: string;
@@ -17,7 +18,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (token: string, user: User) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -53,11 +54,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(newUser);
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    try {
+      // Call API to invalidate refresh token on server
+      await apiLogout();
+    } catch (error) {
+      console.error("Logout API call failed:", error);
+      // Continue with local cleanup even if API call fails
+    } finally {
+      // Clear local storage and state
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setToken(null);
+      setUser(null);
+      // Redirect to login page
+      window.location.href = "/login";
+    }
   };
 
   return (
