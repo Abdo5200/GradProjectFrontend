@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import {
   Brain,
@@ -22,12 +22,18 @@ export function ImageAnalysisPage() {
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any>(null);
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast.error("Please login to access this page");
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogout = async () => {
+    await logout();
   };
 
   const handleDrag = (e: React.DragEvent) => {
